@@ -22,15 +22,13 @@ namespace Geometry
 {
 
   //! A class that holds 2D points
-  /*! It also represents a vector in R2
+  /*! It can also represents a vector in R2
    */
   class Point2D
   {
   public:
     //! Constructor giving coordinates.
     Point2D(double xx=0.0, double yy=0.0):coor{xx,yy}{}
-    //! Copy constructor
-    Point2D(const Point2D&)=default;
     //! Returns coordinates in a array<double>.
     std::array<double,2> get() const { return coor;}
     //! Sets point coordinates
@@ -201,7 +199,7 @@ namespace Geometry
      */
     Square(Point2D origin, double length,double angle=0.0);
     // Specialised version for square
-    std::size_t size() const {return nVertices;}
+    std::size_t size() const override {return nVertices;}
     //! specialised version for Square
     bool checkConvexity() override {return isconvex=true;}
     //! Specialised version for squares
@@ -230,7 +228,7 @@ namespace Geometry
     //! Specialised for Triangles
     Triangle():AbstractPolygon{3}{isconvex=true;}
     // Specialised version for triangle
-    std::size_t size() const {return nVertices;}
+    std::size_t size() const override {return nVertices;}
     //! specialised version for Triangle
     bool checkConvexity() override{ return isconvex=true;};
     double area() const override;//! Specialised for Triangles

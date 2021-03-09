@@ -4,11 +4,16 @@
   including adaptive and Montecarlo. We use the *Decorator* design pattern to
   extend the basic rules. Note that they are all clonable classes.
 
-* `DynamicIntegrands/` An example on how to load dynamically the
-  integrand functions from a shared library. An example of dynamic loading of
-  functions directly using the C style loading.
-
-* `AllDynamic/` Here we add an object factory to be able to load also the quadrature rules dynamically!
+* `AllDynamic/` Here we add an object factory to be able to load also
+  the quadrature rules dynamically. We use the Generic Factory in the
+  folder `GenericFactory`, replicated in `Utility/`. The integrands
+  are also loaded dynamically but with the trick of using C style
+  linkage so that in the library the functiosn are stored with their
+  name, not mangled.  Clearly, it is also possible to use a factory to
+  load the functions, using a similar structure used for the rules.
+  The integrand is wrapped in a std::function, so in principle it is
+  possible to use a parser like muparser, as seen in other examples,
+  with a loss in efficiency (but a gain in flexibility).
 
 To make things work you must
 
@@ -19,10 +24,8 @@ go into `../Utility` (if you have not already done so) and do
 
 to install `libpacs.so` with all support utilities:
 
-go into `../RK45` and do
+go into `../RKFSolver` and do
 
-    make clean
-    make dynamic DEBUG=no
     make install
 
 to install the `librk54.so` library (use `static` instead of `dynamic` if you wish to install the static library)
@@ -34,12 +37,6 @@ go into `../OneDMesh` and do
     make install
 
 to install the `libmesh.so` library
-
-go into `../AbstractFactory` and do
-
-    make install
-
-to install the Object Factory utilities.
 
 Then in `baseVersion/`
 
@@ -59,5 +56,8 @@ Then,
     
 makes a test the uses only the basis version.
 
-Similarly in the other directories.
+Similarly in the other directories. 
+
+**In** `AllDynamic\` **you can only use dynamic libraries. So make sure to run** `make alllibs; make install` **before using the code in** `AllDynamic`
+
 

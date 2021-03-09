@@ -27,7 +27,7 @@ ARFLAGS=-rvU
 export DEBUG=yes
 #CXX=g++-4.9
 #CC=$(CXX)# I am not using C compiler here, simpler to set it equal to c++
-STANDARD=c++11
+STANDARD=c++17
 #
 LIBNAME=linearalgebra
 DYNAMIC_LIBFILE=lib$(LIBNAME).so
@@ -156,7 +156,7 @@ $(DYNAMIC_LIBFILE): $(LIB_OBJS)
 #	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -fPIC -c $?
 
 $(DEPEND): $(SRCS)
-	$(RM)-f $(DEPEND)
+	$(RM) $(DEPEND)
 	for f in $(SRCS); do \
 	$(CXX) $(STDFLAGS) $(CPPFLAGS) -MM $$f >> $(DEPEND); \
 	done

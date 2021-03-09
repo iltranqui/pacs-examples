@@ -1,4 +1,4 @@
-#include "GetPot.hpp"
+#include "GetPot"
 #include "readParameters.hpp"
 #include <fstream>
 parameters readParameters(std::string const & filename,bool verbose)
@@ -31,6 +31,7 @@ parameters readParameters(std::string const & filename,bool verbose)
   values.k=ifile("k",defaults.k);
   values.hc=ifile("hc",defaults.hc);
   values.M=ifile("M",defaults.M);
+  values.solverType=ifile("solverType",defaults.solverType);
   if(verbose)
     {
       std::cout<<"PARAMETER VALUES IN GETPOT FILE"<<"\n";

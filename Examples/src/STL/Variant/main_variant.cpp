@@ -3,7 +3,7 @@
 #include<string>
 #include<vector>
 #include <type_traits>
-//! A function returning eiter a string or an int
+//! A function returning either a string or an int
 //! \param i according to which we return one or the other
 std::variant<std::string,int>
 fun(int const & value)
@@ -21,6 +21,14 @@ struct Operate
   //! operator for int
   void operator()(int const & x){std::cout<<10*x<<std::endl;}
 };
+
+// This part is only for the nerds of you (skip if you are not interested)
+// This is a class with which you can overload an arbitrary number of functors
+template<class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
+// explicit deduction guide (not explained at lecture: it allows to create an overloaded object just using
+// the constructor. Very nice, but it was too much for the course....). Moreover it is not necessary since C+=20.
+template<class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
+// End nerdish part
 
 
 int main()
@@ -43,4 +51,14 @@ int main()
   // now visit each variant
   // The correct overloaded call operator is called on the variant
   for (auto i : v) std::visit(Operate(),i);
+
+  // nerdish part: I construct the visitor using overloaded
+  std::cout<<" Nerdish part"<<std::endl;
+  overloaded visitor{
+      [](int i){std::cout<<"it's an integer equal to "<<i<<std::endl;},
+          [](const std::string & i){std::cout<<"it's a string equal to "<<i<<std::endl;}};
+  for (auto i : v) std::visit(visitor,i);
+  // end nerdish section
+
 }
+

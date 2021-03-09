@@ -1,13 +1,12 @@
 #include "twoFunctions.hpp"
-#include <iostream>
 int main()
 {
-  double a;
-  std::cin >>a;
-  // Here the compiler cannot know the value passed as argument to the
-  // function. The function  will be
-  // inlined (since constexpr implies inline) but not completely
-  // resolved at compile time
-  double x=cubeconst(a);
+    const double a=5.0;
+    // Here the compiler cannot resolve statically since
+    // a is not a constant expression, but a variable.
+    // The function  will be
+    // inlined (since constexpr implies inline) but not completely
+    // resolved at compile time
+    auto x = cubeconst (a);
 }
 

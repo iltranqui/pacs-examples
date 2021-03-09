@@ -11,16 +11,12 @@ recompiling the code, for instance reading them from a file or, like
 in this example, input them from the terminal. MuParserX is more advanced since
 it allows to use vector variables and functions. However, muparser is more efficient. In the given pages you have more details.
 
-First of all you have to install muParser and muParserX (look on the
-web). The library is composed by a library file (libmuparser.so/libmuparserx.so)
-and a set of header files. You can install either on a standard
-directory or in the Examples/lib directory or a directory of your
-choice. *In the latter case you have to modify the entries in the
-local Makefile.inc*
+First of all you have to install muParser and muParserX 
+ The library is composed by a library file (libmuparser.so/libmuparserx.so)
+and a set of header files. You can install it in the standard
+directories of this Examples by going into `Example/muparser(x)/` and running the shell script `install_PACS.sh`.
+You must have `cmake` installed in your system.
 
-For your convenience a copy of muparser is in Extra/muparser and the
-script install.sh will install it in the correct directories under
-Examples/
 
 ##Description of the code in this directory#
 
@@ -45,3 +41,6 @@ used for that purpose: `$(PACS_ROOT_DIR)/include` and
 `$(PACS_ROOT_DIR)/lib`. Necessary for other Examples that uses the
 interface.
 
+# What do I learn here? #
+- The basic usage of [muparser](https://github.com/beltoforion/muparser) and [muparserX](https://beltoforion.de/en/muparserx/)
+- An example on how to hide complex details (muparser and muparserX syntax is not trivial) and provide a simplified interface to the used. This is an simple example of a facade design pattern (the real facade design pattern is more complex though).

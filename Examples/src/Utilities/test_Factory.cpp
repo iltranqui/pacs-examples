@@ -1,5 +1,6 @@
 //! A simple example of use of the generic object Factory template class
 #include "Factory.hpp"
+#include "Proxy.hpp"
 #include <iostream>
 // an abstract class
 class Abstract
@@ -14,7 +15,7 @@ public:
 class Derived1: public Abstract
 {
 public:
-  void whoAmI()
+  void whoAmI() override
   {
     std::cout<<" I am Derived1"<<std::endl;
   }
@@ -23,7 +24,7 @@ public:
 class Derived2: public Abstract
 {
 public:
-  void whoAmI()
+  void whoAmI() override
   {
     std::cout<<" I am Derived2"<<std::endl;
   };
@@ -32,7 +33,7 @@ public:
 class Derived3: public Abstract
 {
 public:
-  void whoAmI()
+  void whoAmI() override
   {
     std::cout<<" I am Derived3"<<std::endl;
   };
@@ -52,16 +53,19 @@ Builder build3=[]{return std::make_unique<Derived3>();};
   
 //! Normally this is done elsewhere, but this is only a test
 /*! 
-  Filling up the factory with the builders 
+  Filling the first 2 factory with the builders 
  */
 void loadFactory()
 {
   auto & factory=MyObjectFactory::Instance();
   factory.add(1,build1);
   factory.add(2,build2);
-  factory.add(3,build3);
 }
-
+// the third with the proxy
+namespace
+{
+  GenericFactory::Proxy<MyObjectFactory,Derived3> P3{3,build3};
+}
   
 int main()
 {

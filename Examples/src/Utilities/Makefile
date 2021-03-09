@@ -61,9 +61,11 @@ else
 endif
 
 #========================== ORA LA DEFINIZIONE DEGLI OBIETTIVI
-.phony= all clean distclean doc library install test
+.phony= all clean distclean doc library install test alllibs
 
-all: $(DEPEND) library test
+alllibs: all
+
+all: $(DEPEND) library
 
 library:
 	make static
@@ -101,7 +103,7 @@ dynamic:
 	make $(DYNAMIC_LIBFILE) LIBTYPE=DYNAMIC
 
 $(DYNAMIC_LIBFILE): $(LIB_OBJS)
-	$(CXX) -shared $(LIB_OBJS) -o $(DYNAMIC_LIBFILE)
+	$(CXX) $(CXXFLAGS) -shared $(LIB_OBJS) -o $(DYNAMIC_LIBFILE)
 
 $(DEPEND): $(SRCS)
 	$(RM) $(DEPEND)

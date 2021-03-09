@@ -26,13 +26,11 @@ double integerPow(const double & x, int n)
 
 double eval (std::vector<double> const & a, double const & x){  
   double sum = a[0];
-  for (std::vector<double>::size_type k = 1; k<a.size(); ++k){ 
-    sum += a[k]*integerPow(x,k);// Pow is VERY expensive
+  for (std::size_t k = 1; k<a.size(); ++k){ 
+    sum += a[k]*integerPow(x,k);// Pow is expensive
     // If you want to test with the standard pow comment the
     // previous statement and uncomment the next one
-    //sum += a[k]*std::pow(x,k);// Pow is VERY expensive
-    
-    
+    //sum += a[k]*std::pow(x,k);// Pow is expensive
   }
   return sum;
 }
@@ -46,7 +44,6 @@ double  horner(std::vector<double> const & a, double const & x){
 
 #ifdef PARALLELEXEC
 #warning "Using parallel implementation of std::transform"
-// NOT WORKING UNTIL IMPLEMENTED IN THE COMPILER
 //! Evaluates polynomial in a set of points (parallel version)
 std::vector<double>
 evaluatePoly(std::vector<double> const & points,
@@ -54,8 +51,12 @@ evaluatePoly(std::vector<double> const & points,
                   polyEval method)
 {
   std::vector<double> result(points.size());
+  // if you prefer a normal loop
+  // for (std::size_t i=0;i<points.size();++i) result[i]=method(a,points[i]);
+  // Here I use std::transform to have parallelism "for free"
   auto compute=[&a,&method] (double const & x){return method(a,x);};
-  std::transform(std::execution::par, points.begin(),points.end(),result.begin(),compute);
+  std::transform(std::execution::par, points.begin(),points.end(),
+                 result.begin(),compute);
   return result;
 }
 #else
@@ -67,6 +68,9 @@ evaluatePoly(std::vector<double> const & points,
                   polyEval method)
 {
   std::vector<double> result(points.size());
+  // if you prefer a normal loop
+  // for (std::size_t i=0;i<points.size();++i) result[i]=method(a,points[i]);
+  // Here I use std::transform to be consistent with the parallel version
   auto compute=[&a,&method] (double const & x){return method(a,x);};
   std::transform(points.begin(),points.end(),result.begin(),compute);
   return result;

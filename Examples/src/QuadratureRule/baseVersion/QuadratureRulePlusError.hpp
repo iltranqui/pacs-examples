@@ -1,30 +1,14 @@
 #ifndef QUADRATURERULEPLUSERROR_HPP
 #define QUADRATURERULEPLUSERROR_HPP
 #include <cmath>
-#include "QuadratureRule.hpp"
 
-namespace NumericalIntegration{
+#include "QuadratureRuleBase.hpp"
 
-  //! A class that will record the error.
-  /*
-    Since the Quadrature rule is composed inside the class that
-    implements composite integration, I need an external object to
-    gather the information about the value of the error estimate of
-    the given rule. I have chosen to use static members, but other
-    solutions ar possible, for instance storing inside the
-    QuadratureRulePlusError class a reference to an object whose role
-    is to record the error. This latter solution is also safer, I have
-    preferred the simpler one in this example.
-   */
-  struct ExtractError
-  {
-    static double error;
-    static void reset(){error=0.0;}
-  };
-  //! Definition of the satic member
-  double ExtractError::error(0.0);
+namespace apsc::NumericalIntegration{
+
+
   /*!
-    \brief Standard quadrature rule plus error.
+    \brief Standard quadrature rule plus computation of error estimate.
 
     This class implements the Decorator design pattern:
     it is implemented in terms of an object of the
@@ -35,17 +19,19 @@ namespace NumericalIntegration{
     an estimate of the error using the classical formula based
     on comparing the integral over h and that over h/2.
 
-    It uses the ExtractError class to pass out the information
-    about the error.
+    Since the Quadrature rule is composed inside the class that
+    implements composite integration, I need a way to
+    gather the information about the value of the error estimate of
+    the given rule. I have chosen to use an mutable variable of an embedded struct
    */
 
   template<typename SQR>
-  class QuadratureRulePlusError final: public QuadratureRule
+  class QuadratureRulePlusError final: public QuadratureRuleBase
   {
   public:
     QuadratureRulePlusError();
     //! Cloning method.
-    QuadratureRuleHandler   clone() const;
+    std::unique_ptr<QuadratureRuleBase>   clone() const override;
     //! Number of quadrature nodes. Delagates to the stored rules.
     int num_nodes()const {return _therule.num_nodes();}
     //! Coordinate of i-th node. Delegates to the stored rules.
@@ -54,19 +40,35 @@ namespace NumericalIntegration{
     double weight(const int i)const{return _therule.weight(i);};
     //! Order of convergence of the rule.
     unsigned int order() const{return _therule.order();};
-    //! The factor used to compute the errore estimate
+    //! The factor used to compute the error estimate
     double factor()const {return _factor;}
     //! The actual rule.
     double apply(FunPoint const &, double const & a,
-			 double const & b) const;
-  protected:
-    //! The underlying rule. static becouse it is common to all objects of the class
-    static SQR _therule;
+			 double const & b) const override;
+    //! String to identify the rule type
+    std::string name()const override{return "QuadratureRulePlusError";}
+    //! Internal class to store the error
+    struct Error
+     {
+       double error=0.0;
+       void reset(){error=0.0;}
+     };
+    //! The error.
+    //! @note mutable since it may change even on const object. Indeed apply() is const
+    //! since it override a const method of the base class.
+    mutable Error ExtractError;
+    protected:
+
+    //! The underlying rule. static because it is common to all objects of the class
+    //! inlided so this is a definition (since C++17)
+    inline static SQR _therule;
     //! Factor used in the calculation of the error estimate.
     double _factor;
+
   };
-  template<typename SQR>
-  SQR QuadratureRulePlusError<SQR>::_therule;
+  // Not needed in C++17
+  //template<typename SQR>
+  //SQR QuadratureRulePlusError<SQR>::_therule;
  
 
   template<typename SQR>
@@ -74,11 +76,11 @@ namespace NumericalIntegration{
   {}
 
   template<typename SQR>
-  QuadratureRuleHandler QuadratureRulePlusError<SQR>::clone() const
-  { return  QuadratureRuleHandler(new QuadratureRulePlusError<SQR>(*this));}
+  std::unique_ptr<QuadratureRuleBase> QuadratureRulePlusError<SQR>::clone() const
+  { return  std::unique_ptr<QuadratureRuleBase>(new QuadratureRulePlusError<SQR>(*this));}
 
   /*! 
-    In the apply method I am using the error formula in a stange way
+    In the apply method I am using the error formula in a strange way
     because want to replicate exactly the behavior of the
     QuadratureBase classes. Thus I compute the error of the formula
     with step h even if I have available the result with step
@@ -93,7 +95,7 @@ namespace NumericalIntegration{
     double result2=
       _therule.apply(f,a,xm)+_therule.apply(f,xm,b);
     // Record the error in the extractor.
-    ExtractError::error+=(result2-result)*_factor;
+    ExtractError.error+=(result2-result)*_factor;
     return result;// I should return result2 see commment above
   }
 }

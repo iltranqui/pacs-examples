@@ -17,7 +17,7 @@
 #include "Eigen/Core"
 
 #if (EIGEN_MAJOR_VERSION < 3) || (EIGEN_WORLD_VERSION < 3)
-#error "I need EIGEN at leasst Version 3.3.X"
+#error "I need EIGEN at least Version 3.3.X"
 #endif
 
 #include "unsupported/Eigen/SparseExtra"
@@ -30,16 +30,16 @@ namespace Eigen
     In this version the output matrix has a full graph even if it is 
     declared symmetric in the file.
     
-    \param SparseMatrixType A Eigen sparse matrix type
+    \tparam SparseMatrixType A Eigen sparse matrix type
     \param filename The name of the file.
   */
-  
   template<typename SparseMatrixType>
   SparseMatrixType read_MM_Matrix(const std::string& filename);
+
   /*!
     Reads an Eigen vector. It returns an Eigen vector 
     It does not work with std::vector.
-    \param Vector type. A Eigen vector type. 
+    \tparam VectorType. A Eigen vector type. 
     \param filename. The name of the file storing the vector
   */
   template<typename VectorType>
@@ -122,7 +122,7 @@ namespace Eigen
       { 
         Index i(-1), j(-1);
         Scalar value; 
-        if( internal::GetMarketLine(line, M, N, i, j, value) ) 
+        if( internal::GetMarketLine(line.str(), M, N, i, j, value) )
         {
           ++ count;
           elements.push_back(T(i,j,value));
@@ -238,10 +238,11 @@ namespace
           }
         else
           { 
-            StorageIndex i(-1), j(-1);
+            StorageIndex i{0}, j(0);
             Scalar value; 
             std::stringstream line(buffer);
-            if(Eigen::internal::GetMarketLine(line, M,N,i, j, value) )
+            line>>i>>j>>value;
+            if(line.good())
             {
               ++count;
               elements.push_back(T(i,j,value));
@@ -330,7 +331,7 @@ namespace Eigen
         if (!std::is_same<std::complex<double>,Scalar>::value)
           {
             throw
-              std::runtime_error(std::string("read_MM_Matrix: wrong matrix type: it should store complex"));          
+              std::runtime_error(std::string("read_MM_Matrix: wrong matrix type: read_MM_Matrix is only for matrices of reals"));
           }
       }
       /*

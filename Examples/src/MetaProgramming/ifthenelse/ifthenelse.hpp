@@ -5,7 +5,8 @@
  The C++11 standard library contains the trait std::conditional
  that does exactly the same thing
 */
-
+namespace apsc::TypeTraits
+{
 //! primary template: assumes the the boolean is true
 /*!
  * @note the third template parameter is not indicated becouse not
@@ -20,7 +21,7 @@ struct IfThenElse
   using type=Ta;
 };
 
-//! partial specialization: false yields third argument
+//! partial specialization: false yield third argument
 template<typename Ta, typename Tb>
 struct IfThenElse <false, Ta, Tb> 
 {
@@ -29,7 +30,7 @@ struct IfThenElse <false, Ta, Tb>
 
 //! A useful type alias. 
 /*!
-  In c++14 you have one for all standard type traits returning a type.
+ Since c++14 you have one for all standard type traits returning a type.
 */
 template<bool C, class Ta, class Tb>
 using IfThenElse_t = typename  IfThenElse<C,Ta,Tb>::type;
@@ -64,6 +65,6 @@ struct If_then_else<false, Ta, Tb> : is_same_type<Tb>
 {
 };
 
-
+}
 //
 #endif // IFTHENELSE_HPP

@@ -13,13 +13,12 @@
  */
 
 // namespace to avoid ambiguities with
-namespace LinearAlgebra {
+namespace apsc::LinearAlgebra {
 
   /*! A trait for the basic types store in the Matrix
     It uses some reasonable default, but it can be specialised
     for your matrix class!.
   */
-  
   template <typename T>
   struct Matrix_Traits
   {
@@ -27,46 +26,35 @@ namespace LinearAlgebra {
     using size_type=std::size_t;
   };
 
-    
+
   template <typename Matrix>
   class TransposedView
   {
   public:
     using size_type=  typename Matrix_Traits<Matrix>::size_type;
-
     using value_type= typename Matrix_Traits<Matrix>::value_type;
     //! A more sophisticated method to get value type!
-    /*
+    /*!
+     * @code
       using value_type=
       typename std::remove_reference<
       typename std::remove_cv<
       decltype(std::declval<Matrix>()(0,0))
       >::type>::type;
+      @endcode
     */
   private:
-    //! A type dependent on the type of the matrix
-    /*
-      If the stored matrix is constant this statement define a
-      const type for the contained values. I am not using it, but
-      is an example of use of conditional.
-     */
-    using vref_type=
-      typename std::conditional<std::is_const<Matrix>::value,
-                                const value_type,
-                                value_type&>::type;
-  public:
-    explicit TransposedView(Matrix& A) : ref(A) {}
-    
 
+  public:
+     TransposedView(Matrix& A) : ref(A) {}
+    
     //! I have to handle the situation when a non const TransposedView stores a const matrix
     /*! 
      The non const version is enabled only if the viewed matrix
-      is non-const. I could have used the vref_type defined above
-      as return type and I would have obtained my objective.
-      But here I show a usage of enable_if
+      is non-const.
     */
     template<typename T=Matrix>
-    std::enable_if_t<!std::is_const<T>::value,value_type &>
+    std::enable_if_t<!std::is_const_v<T>,value_type &>
     operator()(size_type r, size_type c)
     {
       return ref(c, r);
@@ -80,12 +68,26 @@ namespace LinearAlgebra {
   private:
     Matrix& ref;
   };
-  
-  //! This returns the transposed view of a matrix
+  /*!
+   This is a deduction guide.
+   */
   template <typename Matrix>
-  TransposedView<Matrix> inline trans(Matrix& A)
+  TransposedView(const Matrix & )->TransposedView<const Matrix>;
+  template <typename Matrix>
+  TransposedView(Matrix & )->TransposedView<Matrix>;
+
+  
+  /*!
+   * To create a transpose view it is better to use this helper function.
+   * It will create the class with the correct "const compliant" template argument
+   * @tparam Matrix The Matrix type (automatically deduced)
+   * @param A The matrix of which we want to have the transpose view
+   * @return The transposed view
+   */
+  template <typename Matrix>
+  TransposedView<Matrix> inline make_transposeView(Matrix& A)
   {
-    return TransposedView<Matrix>(A);
+    return TransposedView<Matrix>{A};
   }
 }// end namespace
 

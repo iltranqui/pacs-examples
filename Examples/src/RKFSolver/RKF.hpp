@@ -16,7 +16,12 @@
 #include "RKFTraits.hpp"
 namespace apsc
 {
-  //! Struct holding the result for the solver
+  /*!
+   * Structure holding the results of the integration
+   *
+   * @todo It can be made an internal structure of RKF. Indeed, it's use is intrinsically linked with the RKF class.
+   * @tparam KIND The type of traits to be used
+   */
   template <RKFKind KIND>
   struct RKFResult
   {
@@ -34,6 +39,11 @@ namespace apsc
     int contractions{0};
   };
 
+ /*!
+  * A calss for explicit Runge-Kutta Fehlberg type solution of ODEs
+  * @tparam B The Butcher table of the scheme. Must be defined following the scheme shown in ButcherRKF.hpp
+  * @tparam KIND The type of traits to be used: SCALAR, VECTOR, MATRIX
+  */
   template<class B,RKFKind KIND=RKFKind::SCALAR>
   class RKF : public RKFTraits<KIND>
   {
@@ -56,6 +66,7 @@ namespace apsc
      * @param hInit initial time step
      * @param tol desired global error max. norm
      * @param maxstep Safeguard to avoid too many steps (default 2000)
+     * @todo It would be better to group the parameters tol and maxStep into an (internal?) struct
      */
     RKFResult<KIND>
     operator()(double const & T0, double const & T, VariableType const & y0,
@@ -129,9 +140,9 @@ namespace apsc
   else
     factor= 1./(ButcherTable.order-1);
   // Iteration counter
-  unsigned int iter=0;
+  int iter=0;
   // I want to check that the time step does not go ridiculosly small
-  double hmin=100*std::numeric_limits<double>::epsilon();
+  double hmin=100*(T-T0)*std::numeric_limits<double>::epsilon();
   double h=std::max(hInit,hmin);
   double t=T0;
   VariableType ycurr=y0;
@@ -149,10 +160,22 @@ namespace apsc
       // never expand the step!
       double errorPerTimeStep=tol*h/delta;
       // Check if new time step will cross the final time step
-      if(t+h>T)h=T-t;
-      std::tie(ylow,yhigh)=RKFstep(t,ycurr,h);
+      if(t+h>=T)
+	{
+	  h=T-t; // fix h
+	  if (h<hmin) // test is new step very small
+	    {
+	      // step ridicuously small. We are at the end, stop here
+	      ylow=ycurr;
+	      yhigh=ycurr;
+	    }
+	  else
+	    std::tie(ylow,yhigh)=RKFstep(t,ycurr,h); //last step
+	}
+      else
+	    std::tie(ylow,yhigh)=RKFstep(t,ycurr,h); //step
       double currentError=this->norm(ylow-yhigh);
-      double mu=std::pow(errorPerTimeStep/currentError,factor);
+      double mu=std::pow(errorPerTimeStep/currentError,factor);// very expensive:alternative take factor=1 always
       if(currentError<=errorPerTimeStep)
         {
           //fine set new point!
@@ -164,7 +187,7 @@ namespace apsc
           // Expand next step if error very small, step not previously rejected and I am not at the end
           if((mu>=1.0) && !rejected && (t<T))
             {
-              h*=std::min(expansionFactor,mu);
+              h*=std::min(expansionFactor,mu); //alternative use only expansion factor
               ++expansions;
             }
           rejected=false;
@@ -172,7 +195,7 @@ namespace apsc
       else
         {
           rejected=true;
-          h*=mu*reductionFactor;// a little more to be sure
+          h*=mu*reductionFactor;// a little more to be sure. Alternative use only reductionFactor
           ++contractions;
           h= h<=hmin? hmin: h;
         }
