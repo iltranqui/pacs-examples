@@ -1,0 +1,7 @@
+Exerciuse 1:
+Compile Utilities.cpp and make it a shared library named liblinearalgebra.so
+
+ Compile test.cpp and make an executable binary linked against liblinearalgebra.so
+
+Step 1: generate obj file Utilities.o from Utilities.cpp
+Step 2: generate shared library liblinearalgebra.so starting from Utilities.o
