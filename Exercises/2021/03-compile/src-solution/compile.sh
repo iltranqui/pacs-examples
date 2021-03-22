@@ -1,8 +1,11 @@
 #!/bin/bash
 
+<<<<<<< HEAD
 module load gcc-glibc
 module load eigen suitesparse 
 
+=======
+>>>>>>> master
 set -x
 
 function do_distclean {

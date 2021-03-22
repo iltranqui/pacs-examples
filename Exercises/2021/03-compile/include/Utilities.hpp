@@ -38,7 +38,11 @@ namespace LinearAlgebra
     //! Num Nodes
     unsigned int num_nodes()const{return M_degree.size();}
   private:
+<<<<<<< HEAD
     //! The graph, represented as aUt vector of vectors
+=======
+    //! The graph, represented as a vector of vectors
+>>>>>>> master
     std::vector<std::vector<Index>> M_graph;
     //! The degree of each node
     std::vector<Index> M_degree;
