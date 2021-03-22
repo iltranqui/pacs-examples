@@ -14,10 +14,17 @@ LIBMP     ?= -lmuparser
 
 all: $(EXEC) $(EXECMP)
 
+<<<<<<< HEAD
 %.o: %.cpp newton.h
 	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $<
 
 $(EXECMP).o: %.o: %.cpp newton.h muparser_fun.h
+=======
+%.o: %.cpp newton.hpp
+	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $<
+
+$(EXECMP).o: %.o: %.cpp newton.hpp muparser_fun.hpp
+>>>>>>> d29353d33503b636e621e7c30f46234b00f70114
 	$(CXX) -c $(CPPFLAGS) $(CPPFLAGMP) $(CXXFLAGS) $<
 
 $(EXEC): %: %.o 
