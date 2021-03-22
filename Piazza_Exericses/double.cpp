@@ -8,5 +8,5 @@ auto f=[&b](double c){b.emplace_back(c/2.0);};
 auto d=[](double c){std::cout<<c<<"_";};
 
 for (auto i: a)f(i); // fills b
-for (auto i: b)d(i);  // prints b
+for (auto i: b)d(i);  /w/ prints b
 // b contains a/2
