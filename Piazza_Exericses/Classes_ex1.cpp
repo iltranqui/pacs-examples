@@ -8,7 +8,7 @@ class Base
  virtual ~Base()=default;
  // also a good thing is to add a destructor since we added a default contructor
  protected:
- double x=0.;
+ double x=0.
 };
 
 class Derived : public Base

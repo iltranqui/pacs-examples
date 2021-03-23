@@ -1,3 +1,5 @@
 {
-    "C_Cpp.errorSquiggles": "Disabled"
+    "C_Cpp.errorSquiggles": "Disabled",
+    "gnuGlobal.globalExecutable": "C:\\global\\global.exe",
+    "gnuGlobal.gtagsExecutable": "C:\\global\\gtags.exe"
 }
