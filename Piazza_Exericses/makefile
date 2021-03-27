@@ -1,10 +1,13 @@
 # the make File in the folder is executed when you type "make" in the terminal
 
+V17 = -std=c++17
 CXXFLAGS = -std=c++17 -O2 -fPIC
 CPPFLAGS = -DNDEBUG -I$(mkSuitesparseInc) -I$(mkEigenInc) -I../include
 LDFLAGS = -L. -L$(mkSuitesparseLib) -Wl,-rpath=$(PWD)
 LIBS = -lumfpack -llinearalgebra
 CXX= g++ -fPIC
+WALL= -Wall -g -c
+obj= -o
 
 .PHONY: all clean distclean
 
@@ -33,11 +36,28 @@ CXX= g++ -fPIC
 # Utilities.o: Utilities.cpp
 # 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c Utilities.cpp
 
+obj:
+	$(CXX) $(V17) $(WALL) %.0 $(obj) $<
+executable:
+	$(CXX) $(V17) 
+
+
+%.o: %.cpp   # % it takes the extra argument trandosfomrs it into an obejct
+	$(CXX) $(CPPFLAGS) ${CXXFLAGS} -c $< -o $@
+
+# to create executables
+%: %.o
+	$(CXX) $(CPPFLAGS) $< -o $@
+
 clean:
 	# this removes all objects
 	$(RM) *.o 
 	# this removes all executables
 	ls | grep -v "\." | xargs rm
+
+distclean: clean
+	$(RM) $(EXEC) $(EXECMP)
+	$(RM) *~
 
 # clean_unofficial: 
 # 	rm -f Utilities.o test.o liblinearalgebra.so test
